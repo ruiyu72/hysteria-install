@@ -175,12 +175,10 @@ inst_port(){
 
     read -p "设置 Hysteria 2 端口 [1-65535]（回车则随机分配端口）：" port
     [[ -z $port ]] && port=$(shuf -i 2000-65535 -n 1)
-    until [[ -z $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]]; do
-        if [[ -n $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]]; then
-            echo -e "${RED} $port ${PLAIN} 端口已经被其他程序占用，请更换端口重试！"
-            read -p "设置 Hysteria 2 端口 [1-65535]（回车则随机分配端口）：" port
-            [[ -z $port ]] && port=$(shuf -i 2000-65535 -n 1)
-        fi
+    while [[ -n $(ss -tunlp | grep -w udp | awk '{print $5}' | sed 's/.*://g' | grep -w "$port") ]]; do
+        echo -e "${RED} $port ${PLAIN} 端口已经被其他程序占用，请更换端口重试！"
+        read -p "设置 Hysteria 2 端口 [1-65535]（回车则随机分配端口）：" port
+        [[ -z $port ]] && port=$(shuf -i 2000-65535 -n 1)
     done
 
     yellow "将在 Hysteria 2 节点使用的端口是：$port"
