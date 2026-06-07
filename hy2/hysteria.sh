@@ -197,15 +197,11 @@ inst_jump(){
     if [[ $jumpInput == 2 ]]; then
         read -p "设置范围端口的起始端口 (建议10000-65535之间)：" firstport
         read -p "设置一个范围端口的末尾端口 (建议10000-65535之间，一定要比上面起始端口大)：" endport
-        if [[ $firstport -ge $endport ]]; then
-            until [[ $firstport -le $endport ]]; do
-                if [[ $firstport -ge $endport ]]; then
-                    red "你设置的起始端口小于末尾端口，请重新输入起始和末尾端口"
-                    read -p "设置范围端口的起始端口 (建议10000-65535之间)：" firstport
-                    read -p "设置一个范围端口的末尾端口 (建议10000-65535之间，一定要比上面起始端口大)：" endport
-                fi
-            done
-        fi
+        while [[ $firstport -ge $endport ]]; do
+            red "你设置的起始端口大于或等于末尾端口，请重新输入起始和末尾端口"
+            read -p "设置范围端口的起始端口 (建议10000-65535之间)：" firstport
+            read -p "设置一个范围端口的末尾端口 (建议10000-65535之间，一定要比上面起始端口大)：" endport
+        done
         iptables -t nat -A PREROUTING -p udp --dport $firstport:$endport  -j DNAT --to-destination :$port
         ip6tables -t nat -A PREROUTING -p udp --dport $firstport:$endport  -j DNAT --to-destination :$port
         netfilter-persistent save >/dev/null 2>&1
@@ -405,7 +401,7 @@ EOF
     yellow "Clash Meta 客户端配置文件已保存到 /root/hy/clash-meta.yaml"
     yellow "Hysteria 2 节点分享链接如下，并保存到 /root/hy/url.txt"
     red "$(cat /root/hy/url.txt)"
-    yellow "Hysteria 2 节点单端口的分享链接如下，并保存到 /root/hy/url.txt"
+    yellow "Hysteria 2 节点单端口的分享链接如下，并保存到 /root/hy/url-nohop.txt"
     red "$(cat /root/hy/url-nohop.txt)"
 }
 
@@ -544,7 +540,7 @@ showconf(){
     yellow "Clash Meta 客户端配置文件已保存到 /root/hy/clash-meta.yaml"
     yellow "Hysteria 2 节点分享链接如下，并保存到 /root/hy/url.txt"
     red "$(cat /root/hy/url.txt)"
-    yellow "Hysteria 2 节点单端口的分享链接如下，并保存到 /root/hy/url.txt"
+    yellow "Hysteria 2 节点单端口的分享链接如下，并保存到 /root/hy/url-nohop.txt"
     red "$(cat /root/hy/url-nohop.txt)"
 }
 
